@@ -24,6 +24,7 @@ from .internal.instruction.whirlpoolix import (
     SetRewardEmissionsParams,
     SetRewardEmissionsSuperAuthorityParams,
     SwapParams,
+    SwapV2Params,
     UpdateFeesAndRewardsParams,
     InitializePositionBundleParams,
     InitializePositionBundleWithMetadataParams,
