@@ -47,7 +47,7 @@ from .update_fees_and_rewards import (
 from .collect_fees import collect_fees, CollectFeesAccounts
 from .collect_reward import collect_reward, CollectRewardArgs, CollectRewardAccounts
 from .collect_protocol_fees import collect_protocol_fees, CollectProtocolFeesAccounts
-from .swap import swap, SwapArgs, SwapAccounts
+from .swap import swap, swap_v2, SwapArgs, SwapArgsV2, SwapAccounts, SwapAccountsV2
 from .close_position import close_position, ClosePositionAccounts
 from .set_default_fee_rate import (
     set_default_fee_rate,

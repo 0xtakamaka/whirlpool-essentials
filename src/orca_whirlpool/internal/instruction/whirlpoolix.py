@@ -1,12 +1,12 @@
 import dataclasses
 from typing import List
-
-from solders.instruction import Instruction as TransactionInstruction
+from solders.instruction import Instruction as TransactionInstruction, AccountMeta
 from solders.pubkey import Pubkey
 from solders.keypair import Keypair
 # from solders.sysvar import RENT
 # from solders.system_program import ID as SYS_PROGRAM_ID
-# from spl.token.constants import TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID
+from spl.token.constants import TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID
+from spl.memo.constants import MEMO_PROGRAM_ID
 from ..anchor import instructions
 from ..anchor import types
 from ..constants import METAPLEX_METADATA_PROGRAM_ID, ORCA_WHIRLPOOL_NFT_UPDATE_AUTHORITY
@@ -44,6 +44,31 @@ class SwapParams:
     tick_array_0: Pubkey
     tick_array_1: Pubkey
     tick_array_2: Pubkey
+    oracle: Pubkey
+
+
+@dataclasses.dataclass(frozen=True)
+class SwapV2Params:
+    amount: int
+    other_amount_threshold: int
+    sqrt_price_limit: int
+    amount_specified_is_input: bool
+    a_to_b: bool
+    token_authority: Pubkey
+    whirlpool: Pubkey
+    token_mint_a: Pubkey
+    token_mint_b: Pubkey
+    token_owner_account_a: Pubkey
+    token_vault_a: Pubkey
+    token_owner_account_b: Pubkey
+    token_vault_b: Pubkey
+    tick_array_0: Pubkey
+    tick_array_1: Pubkey
+    tick_array_2: Pubkey
+    tick_array_3: Pubkey
+    tick_array_4: Pubkey
+    token_program_a: Pubkey
+    token_program_b: Pubkey
     oracle: Pubkey
 
 
@@ -363,6 +388,48 @@ class WhirlpoolIx:
                 oracle=params.oracle,
             ),
             program_id
+        )
+        return to_instruction([ix])
+
+    @staticmethod
+    def swap_v2(program_id: Pubkey, params: SwapV2Params):
+        ix = instructions.swap_v2(
+            instructions.SwapArgs(
+                amount=params.amount,
+                other_amount_threshold=params.other_amount_threshold,
+                sqrt_price_limit=params.sqrt_price_limit,
+                amount_specified_is_input=params.amount_specified_is_input,
+                a_to_b=params.a_to_b
+                #,
+                #remaining_accounts_info={
+                #    "slices": [
+                #        {
+                #            "accountsType": 6,
+                #            "length": 2
+                #        }
+                #    ]
+                #}
+            ),
+            instructions.SwapAccountsV2(
+                token_program_a=params.token_program_a,
+                token_program_b=params.token_program_b,
+                memo_program=MEMO_PROGRAM_ID,
+                token_authority=params.token_authority,
+                whirlpool=params.whirlpool,
+                token_mint_a=params.token_mint_a,
+                token_mint_b=params.token_mint_b,
+                token_owner_account_a=params.token_owner_account_a,
+                token_vault_a=params.token_vault_a,
+                token_owner_account_b=params.token_owner_account_b,
+                token_vault_b=params.token_vault_b,
+                tick_array0=params.tick_array_0,
+                tick_array1=params.tick_array_1,
+                tick_array2=params.tick_array_2,
+                oracle=params.oracle
+            ),
+            program_id
+            ,
+            [AccountMeta(pubkey=params.tick_array_3, is_signer=False, is_writable=True), AccountMeta(pubkey=params.tick_array_4, is_signer=False, is_writable=True)]
         )
         return to_instruction([ix])
 
